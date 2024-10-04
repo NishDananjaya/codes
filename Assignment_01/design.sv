@@ -1,21 +1,46 @@
 module assignment_01 #(parameter N=4)
 (
     input logic [N-1:0] A,B,
-    input logic ci,
-    input logic [N-1:0] X,
-    input logic SEL,
-    output logic c0,
-    output logic signed [N-1:0] S,
-    output logic signed [N-1:0] out
+    input logic ci,SEL,
+    output logic signed [N:0] out
 
-    
 );
 
+wire c0;
+wire signed [N-1:0] S;
+
+ripple_adder #(N) ra (
+    .A(A),
+    .B(B),
+    .ci(ci),
+    .c0(c0),
+    .S(S)
+);
+
+always_comb begin
+    if (SEL)
+        out = {c0,S};
+    else 
+        out = '0;
+end
+
+
+endmodule
+
+
+module ripple_adder #(parameter N=4)
+(
+    input logic [N-1:0] A,B,
+    input logic ci,
+    output logic c0,
+    output logic [N-1:0] S
+
+);
     logic C [N:0];
 
     always_comb begin
         C[0] = ci;
-        co = C[N];
+        c0 = C[N];
     end
 
     genvar i;
@@ -31,11 +56,22 @@ module assignment_01 #(parameter N=4)
         end
     endgenerate
 
+endmodule
+
+module full_adder(
+    input logic a,b,ci,
+    output logic sum,co
+);
+
+    logic wire_1,wire_2,wire_3;
+
     always_comb begin
-        if (SEL)
-            out = S;
-        else 
-            out = X;
+        wire_1 = a ^ b;
+        wire_2 = wire_1 & ci;
+        wire_3 = a & b;
+
+        co = wire_2 | wire_3;
+        sum = wire_1 ^ ci;
     end
 
 endmodule
